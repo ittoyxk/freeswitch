@@ -15,7 +15,9 @@ steps:
       pull: true
       commands:
       - apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -yq remove libspandsp-dev
-      - DEBIAN_FRONTEND=noninteractive apt-get -yq install libsofia-sip-ua-dev libspandsp3-dev
+      - DEBIAN_FRONTEND=noninteractive apt-get -yq install libspandsp3-dev
+      - git clone https://github.com/freeswitch/sofia-sip.git
+      - cd sofia-sip && ./autogen.sh && ./configure.gnu && make -j`nproc` && make install && cd ..
       - echo "applications/mod_test" >> modules.conf
       - echo 'codecs/mod_openh264' >> modules.conf
       - sed -i '/applications\\/mod_http_cache/s/^#//g' modules.conf
@@ -29,8 +31,9 @@ steps:
       image: signalwire/freeswitch-public-base
       pull: true
       commands:
-      - apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -yq remove libspandsp-dev
-      - DEBIAN_FRONTEND=noninteractive apt-get -yq install libsofia-sip-ua-dev libspandsp3-dev
+      - apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -yq remove libsofia-sip-ua0 libspandsp-dev
+      - DEBIAN_FRONTEND=noninteractive apt-get -yq install libspandsp3-dev
+      - cd sofia-sip && make install && cd ..
       - echo '#!/bin/bash\nmake -j`nproc --all` |& tee ./unit-tests-build-result.txt\nexitstatus=$${PIPESTATUS[0]}\necho $$exitstatus > ./build-status.txt\n' > build.sh
       - chmod +x build.sh
       - ./build.sh
@@ -40,7 +43,8 @@ steps:
       pull: true
       commands:
       - apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -yq remove libspandsp-dev
-      - DEBIAN_FRONTEND=noninteractive apt-get -yq install libsofia-sip-ua-dev libspandsp3-dev
+      - DEBIAN_FRONTEND=noninteractive apt-get -yq install libspandsp3-dev
+      - cd sofia-sip && make install && cd ..
       - make install || true
       - cd tests/unit
       - ./run-tests.sh
@@ -145,6 +149,6 @@ trigger:
 
 ---
 kind: signature
-hmac: af77439b382612b49140cb95f04d6d695e0a188c411ae227abcba205bf96bab9
+hmac: f2f9dca8895694d9786c49eccd670cc82d09dac3f2e17dba9afaf17c7daef455
 
 ...
